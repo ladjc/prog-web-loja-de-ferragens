@@ -1,0 +1,51 @@
+<h3>Sua cesta de compras</h3>
+
+<div class="alert alert-warning" *ngIf="itens.length<=0"><strong>Vazio!</strong>
+    não existem produtos no carrinho!</div>
+
+<div class="row" *ngIf="itens.length>0">
+    <div class="col-12 col-md-8">
+        <div class="card mb-2" *ngFor="let obj of itens">
+            <div class="row g-0">
+                <div class="col-4 col-sm-3">
+                    <img class="img-fluid rounded-start" src="{{obj.produto.codigo}}.jpg" style="width:100%">
+                </div>
+                <div class="col-8 col-sm-9">
+                    <div class="card-body">
+                        <h5 class="card-title">{{obj.produto.nome}}</h5>
+
+                        <p class="card-text" *ngIf="obj.produto.promo>0">
+                            de: <s>R$ {{obj.produto.valor}}</s><br>
+                            por: R$ {{obj.produto.promo}}
+                        </p>
+                        <p class="card-text" *ngIf="obj.produto.promo<=0">
+                            por: R$ {{obj.produto.valor}}
+                        </p>
+
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-sm btn-outline-secondary" (click)="diminuir(obj)">-</button>
+                            <span class="mx-2">{{obj.quantidade}}</span>
+                            <button class="btn btn-sm btn-outline-secondary" (click)="aumentar(obj)">+</button>
+
+                            <button class="btn btn-sm btn-danger ms-3" (click)="remover(obj)">remover</button>
+                        </div>
+
+                        <p class="card-text mt-2">
+                            <strong>Subtotal: R$ {{subtotal(obj)}}</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <div class="card p-3">
+            <h4>Resumo</h4>
+            <hr>
+            <p><strong>Total: R$ {{calculaTotal()}}</strong></p>
+            <button class="btn btn-success mb-2" (click)="finalizarCompra()">Finalizar Compra</button>
+            <button class="btn btn-outline-danger" (click)="limparCarrinho()">Limpar Carrinho</button>
+        </div>
+    </div>
+</div>

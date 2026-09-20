@@ -1,0 +1,18 @@
+<div class="alert alert-info" *ngIf="mensagem.length>0">{{mensagem}}</div>
+<div class="row">
+    <div class="col">
+        <img src="{{obj.codigo}}.jpg" class="w-100">
+    </div>
+    <div class="col">
+        <h3>{{obj.nome}}</h3>
+        <p>{{obj.descritivo}}</p>
+         <p class="card-text" *ngIf="obj.promo>0">
+                 de: <s>R$ {{obj.valor}}</s><br>
+                 por: R$ {{obj.promo}}
+            </p>
+             <p class="card-text" *ngIf="obj.promo<=0">
+                 por: R$ {{obj.valor}}
+            </p>
+            <h6 *ngIf="obj.quantidade==0">sem estoque</h6>
+            <a href="#" class="btn btn-success" *ngIf="obj.quantidade>0">comprar</a>
+    </div></div>
