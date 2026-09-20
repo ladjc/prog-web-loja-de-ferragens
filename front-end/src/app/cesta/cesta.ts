@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { ItemCesta } from '../model/item-cesta';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 
 @Component({
@@ -10,56 +10,38 @@ import { CommonModule } from '@angular/common';
   templateUrl: './cesta.html',
 })
 export class Cesta {
+
   mensagem: string = "";
-  valorCesta:number = 0;
+  valorCesta: number = 0;
 
-  itens: ItemCesta[] = [
-  {
-    "produto": {
-      "codigo": 1,
-      "nome": "Martelo de Unha 25mm",
-      "descritivo": "Martelo com cabo de madeira e cabeça de aço, ideal para trabalhos gerais.",
-      "quantidade": 25,
-      "valor": 39.90,
-      "promo": 29.00,
-      "destaque": 1
-    },
-    "quantidade": 2,
-    "valorTotal": 58.00
-  },
-  {
-    "produto": {
-      "codigo": 2,
-      "nome": "Chave de Fenda 6x150mm",
-      "descritivo": "Chave de fenda com ponta resistente e cabo ergonômico.",
-      "quantidade": 40,
-      "valor": 18.50,
-      "promo": 0,
-      "destaque": 0
-    },
-    "quantidade": 3,
-    "valorTotal": 55.50
-  },
-  {
-    "produto": {
-      "codigo": 3,
-      "nome": "Jogo de Chaves Allen",
-      "descritivo": "Kit com 9 chaves Allen de diferentes medidas para manutenção e montagem.",
-      "quantidade": 18,
-      "valor": 32.90,
-      "promo": 30.00,
-      "destaque": 1
-    },
-    "quantidade": 1,
-    "valorTotal": 30.00
-  }
-];
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
-  ngOnInit(){
-      this.calculaTotal();
+
+  itens: ItemCesta[] = [];
+
+  ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    let json = localStorage.getItem("itemCesta");
+
+    if (json == null) {
+      this.mensagem = "Cesta vazia, adicione produtos!";
+    } else {
+      this.itens = JSON.parse(json);
+
+      if (this.itens.length == 0) {
+        this.mensagem = "Cesta vazia, adicione produtos!";
+      } else {
+        this.mensagem = "";
+      }
+    }
+
+    this.calculaTotal();
   }
 
-  calculaTotal(){
+  calculaTotal() {
     let soma = 0;
     for (let item of this.itens) {
       soma += this.subtotal(item);
@@ -68,12 +50,21 @@ export class Cesta {
   }
 
   aumentar(item: ItemCesta) {
+    const preco = item.produto.promo > 0 ? item.produto.promo : item.produto.valor;
+
     item.quantidade++;
+    item.valorTotal = item.quantidade * preco;
+
+    this.salvarCesta();
   }
 
   diminuir(item: ItemCesta) {
+    const preco = item.produto.promo > 0 ? item.produto.promo : item.produto.valor;
+
     if (item.quantidade > 1) {
       item.quantidade--;
+      item.valorTotal = item.quantidade * preco;
+      this.salvarCesta();
     } else {
       this.remover(item);
     }
@@ -84,21 +75,38 @@ export class Cesta {
     if (index >= 0) {
       this.itens.splice(index, 1);
     }
-  }
 
-   subtotal(item: ItemCesta): number {
-    let valorUnit = item.produto.promo > 0 ? item.produto.promo : item.produto.valor;
-    return valorUnit * item.quantidade;
+    this.salvarCesta();
   }
 
   limparCarrinho() {
     this.itens = [];
+    this.salvarCesta();
+  }
+
+  salvarCesta() {
+    localStorage.setItem("itemCesta", JSON.stringify(this.itens));
+
+    if (this.itens.length == 0) {
+      this.mensagem = "Cesta vazia, adicione produtos!";
+    } else {
+      this.mensagem = "";
+    }
+
+    this.calculaTotal();
+  }
+
+  subtotal(item: ItemCesta): number {
+    let valorUnit = item.produto.promo > 0 ? item.produto.promo : item.produto.valor;
+    return valorUnit * item.quantidade;
   }
 
   finalizarCompra() {
     alert("Compra finalizada! Total: R$ " + this.calculaTotal());
     this.limparCarrinho();
   }
+
+
 
 
 }

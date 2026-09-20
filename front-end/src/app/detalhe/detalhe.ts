@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Produto } from '../model/produto';
 
 @Component({
@@ -8,18 +8,23 @@ import { Produto } from '../model/produto';
   styleUrl: './detalhe.css',
   templateUrl: './detalhe.html',
 })
-export class Detalhe {
-  obj:Produto = new Produto();
-  mensagem:string = "";
+export class Detalhe implements OnInit {
+  obj: Produto = new Produto();
+  mensagem: string = "";
 
-  ngOnInit(){
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     let json = localStorage.getItem("produto");
-    if(json==null){
+    if (json == null) {
       this.mensagem = "Produto Invalido, verifique!";
-    }  else {
+    } else {
       this.mensagem = "";
       this.obj = JSON.parse(json);
     }
   }
-
 }
