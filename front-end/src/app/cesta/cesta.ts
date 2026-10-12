@@ -105,8 +105,4 @@ export class Cesta {
     alert("Compra finalizada! Total: R$ " + this.calculaTotal());
     this.limparCarrinho();
   }
-
-
-
-
 }
